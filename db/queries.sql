@@ -6,14 +6,24 @@ LEFT JOIN role ON department.id = role.department_id;
 
 SELECT employee.id, employee.first_name, employee.last_name, 
         role.title AS position, department.name AS department,
-        role.salary, employee.manager_id
+        role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager
 FROM employee
-JOIN role ON employee.role_id = role.id
-JOIN department ON department.id = role.department_id;
+LEFT JOIN role ON employee.role_id = role.id
+LEFT JOIN department ON department.id = role.department_id
+LEFT JOIN employee manager ON manager.id = employee.manager_id;
 
 
 
 INSERT INTO department (name)
 VALUES ('${department}')
 
-INSERT INTO role (title, salary, department.id)
+SELECT employee.id, employee.first_name, employee.last_name, 
+        role.title AS position, 
+        CONCAT(manager.first_name, ' ', manager.last_name) AS manager
+FROM employee
+LEFT JOIN role ON employee.role_id = role.id
+LEFT JOIN employee manager ON manager.id = employee.manager_id;
+
+SELECT employee.id, CONCAT(first_name, ' ', last_name) AS employee, role.title
+FROM employee
+LEFT JOIN role ON employee.role_id = role.id;
