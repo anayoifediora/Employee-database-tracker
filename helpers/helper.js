@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 
+
 require('dotenv').config()
 
 let employeeQuery =  `SELECT employee.id, employee.first_name, employee.last_name, 
@@ -25,10 +26,7 @@ const db = mysql.createConnection(
 
 
 function viewDepartments() {
-    db.query('SELECT * FROM department', (err, rows) => {
-        if(err) throw err;
-        console.table(rows)
-    })
+    return db.promise().query('SELECT * FROM department')
         
 }
 
@@ -36,21 +34,13 @@ function viewRoles() {
     const roleQuery = `SELECT department.name AS department, role.title, role.salary
                         FROM department
                         LEFT JOIN role ON department.id = role.department_id;`
-    db.query(roleQuery, (err, rows) => {
-        if (err) throw err;
-        console.table(rows)
-        
-    })
+    return db.promise().query(roleQuery)
     
 }
 
 function viewEmployees() {
      
-    db.query(employeeQuery, (err, rows) => {
-        if (err) throw err;
-        console.table(rows)
-        
-    })
+    return db.promise().query(employeeQuery)
 
 }
 

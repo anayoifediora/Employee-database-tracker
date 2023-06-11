@@ -16,28 +16,37 @@ function initialize() {
         .then(({task}) => {
             switch (task) {
                 case 'View all departments':
-                    helpers.viewDepartments()
-                    initialize()
+                    helpers.viewDepartments().then((res) => {
+                        console.table(res[0])
+                        initialize()
+                    })
+                    .catch((err) => {
+                        console.error(err)
+                    })
                     break;
                 case 'View all roles': 
-                    helpers.viewRoles()
-                    initialize()
+                    helpers.viewRoles().then((res) => {
+                        console.table(res[0])
+                        initialize()
+                    })
+                    .catch((err) => {
+                        console.error(err)
+                    })
                     break;
                 case 'View All Employees':
-                    helpers.viewEmployees();
-                    initialize()
+                    helpers.viewEmployees().then((res) => {
+                        console.table(res[0])
+                        initialize()
+                    })
                     break;
                 case 'Add Department':
-                    helpers.addDepartment();
-                    initialize()
+                    helpers.addDepartment()
                     break;
                 case 'Add role':
                     helpers.addRole();
-                    initialize()
                     break;
                 case 'Add Employee':
                     helpers.addEmployee();
-                    initialize()
                     break;
                 case 'Update Employee Role':
                     helpers.updateEmployeeRole()
@@ -53,6 +62,4 @@ function initialize() {
 
 }
 initialize()
-
-
 
