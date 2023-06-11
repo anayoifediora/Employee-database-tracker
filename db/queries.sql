@@ -27,3 +27,13 @@ LEFT JOIN employee manager ON manager.id = employee.manager_id;
 SELECT employee.id, CONCAT(first_name, ' ', last_name) AS employee, role.title
 FROM employee
 LEFT JOIN role ON employee.role_id = role.id;
+
+UPDATE employee
+SET  role_id = 4
+where id = 1;
+
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES ('${firstname}', '${lastname}', ${employeeRole}, ${managerName})
+
+INSERT INTO role (title, salary, department_id)
+VALUES ('${res.title}', ${res.salary}, ${res.department});

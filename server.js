@@ -17,21 +17,27 @@ function initialize() {
             switch (task) {
                 case 'View all departments':
                     helpers.viewDepartments()
+                    initialize()
                     break;
                 case 'View all roles': 
                     helpers.viewRoles()
+                    initialize()
                     break;
                 case 'View All Employees':
                     helpers.viewEmployees();
+                    initialize()
                     break;
                 case 'Add Department':
                     helpers.addDepartment();
+                    initialize()
                     break;
                 case 'Add role':
                     helpers.addRole();
+                    initialize()
                     break;
                 case 'Add Employee':
                     helpers.addEmployee();
+                    initialize()
                     break;
                 case 'Update Employee Role':
                     helpers.updateEmployeeRole()
@@ -45,7 +51,7 @@ function initialize() {
             console.log(err)
         })
 
-    }
+}
 initialize()
 
 

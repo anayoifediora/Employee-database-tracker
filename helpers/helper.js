@@ -28,7 +28,6 @@ function viewDepartments() {
     db.query('SELECT * FROM department', (err, rows) => {
         if(err) throw err;
         console.table(rows)
-        initialize()
     })
         
 }
@@ -74,49 +73,72 @@ function addDepartment() {
 };
 
 function addRole() {
-    db.query(`SELECT * FROM department;`, (err, res) => {
-        if (err) throw err
-        console.log(res)
+    db.promise().query(`SELECT id, name FROM department;`)
+        .then((res) => {
+            let department = res[0].map((item) => {
+                return {
+                    name: item.name,
+                    value: item.id
+                }
+            })
+            
         inquirer.prompt([
             {
                 type: 'input',
-                name: 'title',
-                message: 'What is the name of the role?'
+                name: 'rolename',
+                message: 'What is the name of the role?',
             },
             {
                 type: 'input',
                 name: 'salary',
-                message: 'What is the salary of the role?'
+                message: 'What is the salary of the role?',
             },
             {
                 type: 'list',
                 name: 'department',
                 message: 'What department does the role belong to?',
-                choices: res
-            }
+                choices: department
+            },
         ])
-        .then(({title, salary, department}) => {
-            db.promise().query(`INSERT INTO role (title, salary, department)
-                                VALUES ('${title}', ${salary}, '${department}');
+        
+        .then((res) => {
+            
+            db.promise().query(`INSERT INTO role (title, salary, department_id)
+                                VALUES ('${res.rolename}', ${res.salary}, ${res.department});
                                 `)
-            console.log(`Added ${role} to the database`)
+            console.log(`Added ${res.rolename} to the database`)
         })
         .catch((error) => {
             console.error(error)
         })
     })
+    
 }
 
 function addEmployee() {
-    const addEmployeeQuery = `SELECT employee.id, employee.first_name, employee.last_name, 
-                              role.title AS position, 
+    const addEmployeeQuery = `SELECT employee.id, role.title AS Position, employee.manager_id AS manager_id,
                               CONCAT(manager.first_name, ' ', manager.last_name) AS manager
                               FROM employee
-                              LEFT JOIN role ON employee.role_id = role.id
-                              LEFT JOIN employee manager ON manager.id = employee.manager_id;`
-    db.query(addEmployeeQuery, (err, res) => {
-        if (err) throw err
-        console.log(res)
+                              INNER JOIN role ON employee.role_id = role.id
+                              INNER JOIN employee manager ON manager.id = employee.manager_id;`
+    db.promise().query(addEmployeeQuery)
+    .then(async (res) => {
+        let managerName = res[0].map((item) => {
+            return {
+                    name: item.manager,
+                    value: item.manager_id
+                }
+        
+        })
+
+        let roles = await db.promise().query(`SELECT * FROM role;`)
+        .then((res) => res)
+          let employeeRole = roles[0].map((item) => {
+            return {
+                name: item.title,
+                value: item.id
+            }
+        })
         inquirer.prompt([
             {
                 type: 'input',
@@ -132,62 +154,79 @@ function addEmployee() {
                 type: 'list',
                 name: 'role',
                 message: 'What is the employee role?',
-                choices: positions
+                choices: employeeRole
             },
             {
                 type: 'list',
-                name: 'role',
-                message: 'Who is the employee'+'s' + 'manager?',
-                choices: managerNames
+                name: 'manager',
+                message: `Who is the employee's manager?`,
+                choices: managerName
             }
         ])
-        // .then(({title, salary, department}) => {
-        //     db.promise().query(`INSERT INTO role (title, salary, department)
-        //                         VALUES ('${title}', ${salary}, '${department}');
-        //                         `)
-        //     console.log(`Added ${role} to the database`)
-        // })
-        // .catch((error) => {
-        //     console.error(error)
-        // })
+        .then((res) => {
+            db.promise().query(`INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                                VALUES ('${res.firstname}', '${res.lastname}', 
+                                ${res.role}, ${res.manager});
+                                `)
+            console.log(`Added ${res.firstname} ${res.lastname} to the database`)
+        })
+        .catch((error) => {
+            console.error(error)
+        })
     })
 
 }
 
 function updateEmployeeRole() {
-    const roleUpdateQuery = `SELECT employee.id, CONCAT(first_name, ' ', last_name) AS employee, role.title
+    const employeeUpdateQuery = `SELECT employee.id, CONCAT(first_name, ' ', last_name) AS employee, role.title
                              FROM employee
                              LEFT JOIN role ON employee.role_id = role.id;`
-    db.query(roleUpdateQuery, (err, res) => {
-        if (err) throw err
-        console.log(res)
-        res.forEach(res => console.log(res.employee))
+    db.promise().query(employeeUpdateQuery) 
+        .then(async (res) => {
+            let employeeName = res[0].map((item) => {
+                return {
+                        name: item.employee,
+                        value: item.id
+                    }
+            
+            })
+        let roles = await db.promise().query(`SELECT * FROM role;`)
+        .then((res) => res)
+        console.log(roles[0])
+        let employeeRole = roles[0].map((item) => {
+            return {
+                name: item.title,
+                value: item.id
+            }
+        })
+        
         inquirer.prompt([
             {
                 type: 'list',
-                name: 'employee_name',
+                name: 'employee_id',
                 message: 'Which employee do you want to update?',
-                choices: []
+                choices: employeeName
             },
             {
                 type: 'list',
                 name: 'role',
                 message: 'Which role do you want to assign the selected employee?',
-                choices: []
+                choices: employeeRole
             }
             
         ])
-    //     .then(({title, salary, department}) => {
-    //         db.promise().query(`INSERT INTO role (title, salary, department)
-    //                             VALUES ('${title}', ${salary}, '${department}');
-    //                             `)
-    //         console.log(`Added ${role} to the database`)
-    //     })
-    //     .catch((error) => {
-    //         console.error(error)
-    //     })
+        .then(({role, employee_id}) => {
+            db.promise().query(`UPDATE employee SET role_id = ${role} 
+                                WHERE id = ${employee_id}`)
+            console.log(`Added employee role on the database`)
+        })
+        .catch((error) => {
+            console.error(error)
+        })
     })
-    
+    .catch((err) => {
+        console.error(err)
+    })
 }
 
 module.exports = {viewDepartments, viewRoles, viewEmployees, 
