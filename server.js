@@ -3,6 +3,18 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const helpers = require('./helpers/helper');
 
+const db = mysql.createConnection(
+    {
+        
+        host: 'localhost',
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME
+    },
+    // console.log(`Connected to the employee_db.`)
+)
+
+
 function initialize() {
         inquirer.prompt([
             {
@@ -41,12 +53,21 @@ function initialize() {
                     break;
                 case 'Add Department':
                     helpers.addDepartment()
+                    .then(({department}) => {
+                        db.promise().query(`INSERT INTO department (name)
+                                            VALUES ("${department}");`)
+                        console.log(`Added ${department} to the database`)
+                        initialize()
+                    })
+                    .catch((error) => {
+                        console.error(error)
+                    })
                     break;
                 case 'Add role':
-                    helpers.addRole();
+                    helpers.addRole()  
                     break;
                 case 'Add Employee':
-                    helpers.addEmployee();
+                    helpers.addEmployee()   
                     break;
                 case 'Update Employee Role':
                     helpers.updateEmployeeRole()

@@ -52,15 +52,15 @@ function addDepartment() {
             message: 'What is the name of the department?'
         }
     ])
-    .then(({department}) => {
-        db.promise().query(`INSERT INTO department (name)
-                            VALUES ("${department}");`)
-        console.log(`Added ${department} to the database`)
-    })
-    .catch((error) => {
-        console.error(error)
-    })
-};
+    // .then(({department}) => {
+    //     db.promise().query(`INSERT INTO department (name)
+    //                         VALUES ("${department}");`)
+    //     console.log(`Added ${department} to the database`)
+    // })
+    // .catch((error) => {
+    //     console.error(error)
+    // })
+}
 
 function addRole() {
     db.promise().query(`SELECT id, name FROM department;`)
@@ -182,7 +182,6 @@ function updateEmployeeRole() {
             })
         let roles = await db.promise().query(`SELECT * FROM role;`)
         .then((res) => res)
-        console.log(roles[0])
         let employeeRole = roles[0].map((item) => {
             return {
                 name: item.title,
@@ -218,6 +217,7 @@ function updateEmployeeRole() {
         console.error(err)
     })
 }
+
 
 module.exports = {viewDepartments, viewRoles, viewEmployees, 
                  addDepartment, addRole, addEmployee, updateEmployeeRole}
