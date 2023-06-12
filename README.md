@@ -18,6 +18,6 @@ The following link displays the functionality of the application:
 
 The link to the github page can be found below:
 
-[Github](https://github.com/anayoifediora/SVG-Logo-Creator)
+[Github](https://github.com/anayoifediora/Employee-database-tracker)
 
 
